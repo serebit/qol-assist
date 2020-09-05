@@ -1,1 +1,8 @@
 /build/
+
+/bin/
+/pkg/
+
+# GoLand files
+/.idea/
+/*.iml

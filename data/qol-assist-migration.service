@@ -1,0 +1,11 @@
+[Unit]
+Description=QoL Migration Service
+ConditionPathExists=/var/lib/qol-assist/trigger
+After=systemd-sysusers.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/sbin/qol-assist migrate
+
+[Install]
+WantedBy=sysinit.target
