@@ -101,7 +101,7 @@ subdir('data')
 subdir('man')
 
 # Now go build the source
-subdir('src')
+subdir('oldsrc')
 
 report = [
     '    Build configuration:',
