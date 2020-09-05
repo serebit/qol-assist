@@ -20,7 +20,7 @@
  * afford us the ability to grow in the future..
  */
 typedef struct QolContext {
-        QolUserManager *user_manager;
+	QolUserManager* user_manager;
 } QolContext;
 
 /**
@@ -29,14 +29,14 @@ typedef struct QolContext {
  *
  * @returns A newly allocated QolContext
  */
-QolContext *qol_context_new(void);
+QolContext* qol_context_new(void);
 
 /**
  * Free an existing QolContext
  *
  * @param context Pointer to an allocated context
  */
-void qol_context_free(QolContext *context);
+void qol_context_free(QolContext* context);
 
 /**
  * Migration functions follow a very strict API and are provided access to
@@ -45,25 +45,12 @@ void qol_context_free(QolContext *context);
  * If a migration func returns true, we'll bump the migration level, otherwise
  * it is considered a migration error.
  */
-typedef bool (*qol_migration_func)(QolContext *context);
+typedef bool (*qol_migration_func)(QolContext* context);
 
 /**
  * Helps to describe a QolMigration for logging purposes
  */
 typedef struct QolMigration {
-        const char *name;
-        qol_migration_func func;
+	const char* name;
+	qol_migration_func func;
 } QolMigration;
-
-/*
- * Editor modelines  -  https://www.wireshark.org/tools/modelines.html
- *
- * Local variables:
- * c-basic-offset: 8
- * tab-width: 8
- * indent-tabs-mode: nil
- * End:
- *
- * vi: set shiftwidth=8 tabstop=8 expandtab:
- * :indentSize=8:tabSize=8:noTabs=true:
- */

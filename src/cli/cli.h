@@ -17,35 +17,23 @@
  * Basic CLI utilities
  */
 typedef struct SubCommand {
-        const char *name; /**<Name of this subcommand */
-        bool (*execute)(int argc, char **argv);
-        const char *short_desc; /**<Short description to display */
+	const char* name; /**<Name of this subcommand */
+	bool (*execute)(int argc, char** argv);
+
+	const char* short_desc; /**<Short description to display */
 } SubCommand;
 
 /**
  * List users on the system
  */
-bool qol_cli_list_users(int argc, char **argv);
+bool qol_cli_list_users(int argc, char** argv);
 
 /**
  * Perform any migration tasks as deemed needed
  */
-bool qol_cli_migrate(int argc, char **argv);
+bool qol_cli_migrate(int argc, char** argv);
 
 /**
  * Trigger a migration on next boot
  */
-bool qol_cli_trigger(int argc, char **argv);
-
-/*
- * Editor modelines  -  https://www.wireshark.org/tools/modelines.html
- *
- * Local variables:
- * c-basic-offset: 8
- * tab-width: 8
- * indent-tabs-mode: nil
- * End:
- *
- * vi: set shiftwidth=8 tabstop=8 expandtab:
- * :indentSize=8:tabSize=8:noTabs=true:
- */
+bool qol_cli_trigger(int argc, char** argv);

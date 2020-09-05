@@ -26,7 +26,7 @@
  * @param n_shells Pointer to store the number of shell entries in
  * @returns Allocated array of allocated strings
  */
-char **qol_get_shells(size_t *n_shells);
+char** qol_get_shells(size_t* n_shells);
 
 /**
  * Free an array of strings
@@ -34,7 +34,7 @@ char **qol_get_shells(size_t *n_shells);
  * @param strv Pointer to the string array
  * @param n_str Number of entries in the list
  */
-void qol_free_stringv(char **strv, size_t n_str);
+void qol_free_stringv(char** strv, size_t n_str);
 
 /**
  * Fork and execute the given command
@@ -43,7 +43,7 @@ void qol_free_stringv(char **strv, size_t n_str);
  *
  * @returns True if the command succeeded
  */
-bool qol_exec_command(char **command);
+bool qol_exec_command(char** command);
 
 /**
  * Determine if the given path exists
@@ -52,17 +52,4 @@ bool qol_exec_command(char **command);
  *
  * @returns True if the path exists
  */
-bool qol_file_exists(const char *path);
-
-/*
- * Editor modelines  -  https://www.wireshark.org/tools/modelines.html
- *
- * Local variables:
- * c-basic-offset: 8
- * tab-width: 8
- * indent-tabs-mode: nil
- * End:
- *
- * vi: set shiftwidth=8 tabstop=8 expandtab:
- * :indentSize=8:tabSize=8:noTabs=true:
- */
+bool qol_file_exists(const char* path);

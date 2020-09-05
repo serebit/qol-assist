@@ -18,20 +18,6 @@
 /**
  * Add all active/admin users into the scanner group
  */
-bool qol_migration_01_scanner_group(QolContext *context)
-{
-        return qol_migration_push_active_admin_group(context, "scanner");
+bool qol_migration_01_scanner_group(QolContext* context) {
+	return qol_migration_push_active_admin_group(context, "scanner");
 }
-
-/*
- * Editor modelines  -  https://www.wireshark.org/tools/modelines.html
- *
- * Local variables:
- * c-basic-offset: 8
- * tab-width: 8
- * indent-tabs-mode: nil
- * End:
- *
- * vi: set shiftwidth=8 tabstop=8 expandtab:
- * :indentSize=8:tabSize=8:noTabs=true:
- */

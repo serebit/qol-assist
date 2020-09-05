@@ -18,26 +18,26 @@
  * QolUser represents a system user in an accessible fashion.
  */
 typedef struct QolUser {
-        struct QolUser *next; /**<Next user in the chain */
+	struct QolUser* next; /**<Next user in the chain */
 
-        char **groups;   /**<All groups the user belongs to */
-        size_t n_groups; /**<Number of groups */
+	char** groups;	 /**<All groups the user belongs to */
+	size_t n_groups; /**<Number of groups */
 
-        char *name; /**<Username */
-        uid_t uid;  /**<User ID */
-        gid_t gid;  /**<Primary group ID */
+	char* name; /**<Username */
+	uid_t uid;	/**<User ID */
+	gid_t gid;	/**<Primary group ID */
 
-        bool valid_shell; /**<Whether the shell is actually valid */
+	bool valid_shell; /**<Whether the shell is actually valid */
 } QolUser;
 
 /**
  * QolUserManager allows us to introspect the system users and modify them
  */
 typedef struct QolUserManager {
-        QolUser *users; /**<Known users */
+	QolUser* users; /**<Known users */
 
-        char **shells;
-        size_t n_shells;
+	char** shells;
+	size_t n_shells;
 } QolUserManager;
 
 /**
@@ -45,7 +45,7 @@ typedef struct QolUserManager {
  *
  * @returns Newly allocated QolUserManager
  */
-QolUserManager *qol_user_manager_new(void);
+QolUserManager* qol_user_manager_new(void);
 
 /**
  * Attempt to refresh the manager state with the users
@@ -53,14 +53,14 @@ QolUserManager *qol_user_manager_new(void);
  * @param manager Pointer to an allocated QolUserManager
  * @returns True if the operation succeeded
  */
-bool qol_user_manager_refresh(QolUserManager *manager);
+bool qol_user_manager_refresh(QolUserManager* manager);
 
 /**
  * Free a previously allocated QolUserManager
  *
  * @param manager Pointer to an allocated QolUserManager
  */
-void qol_user_manager_free(QolUserManager *manager);
+void qol_user_manager_free(QolUserManager* manager);
 
 /**
  * Attempt to change the group ID for the given group
@@ -71,7 +71,7 @@ void qol_user_manager_free(QolUserManager *manager);
  *
  * @returns True if the update worked, otherwise false.
  */
-bool qol_user_manager_change_group_id(QolUserManager *manager, const char *group, int gid);
+bool qol_user_manager_change_group_id(QolUserManager* manager, const char* group, int gid);
 
 /**
  * Get the group ID for the named group
@@ -81,7 +81,7 @@ bool qol_user_manager_change_group_id(QolUserManager *manager, const char *group
  *
  * @returns The new gid, or -1 for an unknown group ID
  */
-int qol_user_manager_get_group_id(QolUserManager *manager, const char *group);
+int qol_user_manager_get_group_id(QolUserManager* manager, const char* group);
 
 /**
  * Determine if this is an "active" user, i.e. not a system user
@@ -90,7 +90,7 @@ int qol_user_manager_get_group_id(QolUserManager *manager, const char *group);
  *
  * @returns True if the user is considered "active"
  */
-bool qol_user_is_active(QolUser *user);
+bool qol_user_is_active(QolUser* user);
 
 /**
  * Determine if the user is in a group
@@ -100,7 +100,7 @@ bool qol_user_is_active(QolUser *user);
  *
  * @returns True if the user is a member of the named group
  */
-bool qol_user_in_group(QolUser *user, const char *group);
+bool qol_user_in_group(QolUser* user, const char* group);
 
 /**
  * Determine if this user has admin capabilities
@@ -109,7 +109,7 @@ bool qol_user_in_group(QolUser *user, const char *group);
  *
  * @returns True if the user is considered an admin
  */
-bool qol_user_is_admin(QolUser *user);
+bool qol_user_is_admin(QolUser* user);
 
 /**
  * Attempt to add the given user to the named group
@@ -121,17 +121,4 @@ bool qol_user_is_admin(QolUser *user);
  *
  * @returns True if the user was added to the group
  */
-bool qol_user_add_to_group(QolUser *self, const char *group);
-
-/*
- * Editor modelines  -  https://www.wireshark.org/tools/modelines.html
- *
- * Local variables:
- * c-basic-offset: 8
- * tab-width: 8
- * indent-tabs-mode: nil
- * End:
- *
- * vi: set shiftwidth=8 tabstop=8 expandtab:
- * :indentSize=8:tabSize=8:noTabs=true:
- */
+bool qol_user_add_to_group(QolUser* self, const char* group);

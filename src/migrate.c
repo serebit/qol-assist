@@ -16,46 +16,31 @@
 
 #include "migrate.h"
 
-QolContext *qol_context_new(void)
-{
-        QolContext *ret = NULL;
+QolContext* qol_context_new(void) {
+	QolContext* ret = NULL;
 
-        ret = calloc(1, sizeof(QolContext));
-        if (!ret) {
-                fputs("OOM\n", stderr);
-                return NULL;
-        }
+	ret = calloc(1, sizeof(QolContext));
+	if (!ret) {
+		fputs("OOM\n", stderr);
+		return NULL;
+	}
 
-        ret->user_manager = qol_user_manager_new();
-        if (!ret->user_manager) {
-                goto failed;
-        }
+	ret->user_manager = qol_user_manager_new();
+	if (!ret->user_manager) {
+		goto failed;
+	}
 
-        return ret;
+	return ret;
 
 failed:
-        qol_context_free(ret);
-        return NULL;
+	qol_context_free(ret);
+	return NULL;
 }
 
-void qol_context_free(QolContext *self)
-{
-        if (!self) {
-                return;
-        }
-        qol_user_manager_free(self->user_manager);
-        free(self);
+void qol_context_free(QolContext* self) {
+	if (!self) {
+		return;
+	}
+	qol_user_manager_free(self->user_manager);
+	free(self);
 }
-
-/*
- * Editor modelines  -  https://www.wireshark.org/tools/modelines.html
- *
- * Local variables:
- * c-basic-offset: 8
- * tab-width: 8
- * indent-tabs-mode: nil
- * End:
- *
- * vi: set shiftwidth=8 tabstop=8 expandtab:
- * :indentSize=8:tabSize=8:noTabs=true:
- */

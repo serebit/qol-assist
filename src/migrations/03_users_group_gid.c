@@ -23,20 +23,6 @@
  * the 900 range, so we forcibly set it back to 100 here before using it
  * for anything.
  */
-bool qol_migration_03_users_group_gid(QolContext *context)
-{
-        return qol_migration_update_group_id(context, "users", 100);
+bool qol_migration_03_users_group_gid(QolContext* context) {
+	return qol_migration_update_group_id(context, "users", 100);
 }
-
-/*
- * Editor modelines  -  https://www.wireshark.org/tools/modelines.html
- *
- * Local variables:
- * c-basic-offset: 8
- * tab-width: 8
- * indent-tabs-mode: nil
- * End:
- *
- * vi: set shiftwidth=8 tabstop=8 expandtab:
- * :indentSize=8:tabSize=8:noTabs=true:
- */
