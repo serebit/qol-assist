@@ -19,9 +19,9 @@ providing a solid user experience whilst still being able to make deep changes t
 **Note**: This is a brand-new project and is currently being built for a very specific Solus
 need, but it will grow in time to be an agnostic project suitable outside of Solus.
 
-`qol-assist` is a [Solus project](https://getsol.us/)
+`qol-assist` is a [Solus project.](https://getsol.us/)
 
-![logo](https://build.getsol.us/logo.png)
+![Solus logo](https://build.getsol.us/logo.png)
 
 ## Authors
 
