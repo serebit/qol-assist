@@ -19,7 +19,6 @@ import "github.com/DataDrake/cli-ng/cmd"
 var listUsersCMD = &cmd.CMD{
 	Name:  "list-users",
 	Short: "List users on the system and their associated groups",
-	Args:  &struct{}{},
 	Run:   listUsers,
 }
 
