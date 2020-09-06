@@ -11,8 +11,13 @@
 
 package main
 
-import "fmt"
+import (
+	"os"
+	"qol-assist/cmd"
+)
 
 func main() {
-	fmt.Println("hello world")
+	if err := cmd.RootCmd.Execute(); err != nil {
+		os.Exit(1)
+	}
 }
