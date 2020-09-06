@@ -17,5 +17,5 @@ package main
 import "github.com/getsolus/qol-assist/cli"
 
 func main() {
-	cli.RootCMD.Run()
+	cli.Root.Run()
 }

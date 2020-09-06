@@ -18,13 +18,11 @@ import (
 	"github.com/DataDrake/cli-ng/cmd"
 )
 
-var triggerCMD = &cmd.CMD{
+var trigger = &cmd.CMD{
 	Name:  "trigger",
 	Short: "Schedule migration on next boot",
 	Alias: "t",
-	Run:   trigger,
-}
+	Run: func(_ *cmd.RootCMD, _ *cmd.CMD) {
 
-func trigger(_ *cmd.RootCMD, _ *cmd.CMD) {
-
+	},
 }

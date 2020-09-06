@@ -21,13 +21,12 @@ import (
 
 const QolAssistVersion = "0.5.0"
 
-var versionCMD = &cmd.CMD{
+var version = &cmd.CMD{
 	Name:  "version",
 	Short: "Print the qol-assist version and exit",
-	Run:   printVersion,
-}
-
-func printVersion(_ *cmd.RootCMD, _ *cmd.CMD) {
-	fmt.Printf("qol-assist version %v\n\nCopyright © 2017-2020 Solus Project\n", QolAssistVersion)
-	fmt.Println("Licensed under the Apache License, Version 2.0")
+	Alias: "v",
+	Run: func(_ *cmd.RootCMD, _ *cmd.CMD) {
+		fmt.Printf("qol-assist version %v\n\nCopyright © 2017-2020 Solus Project\n", QolAssistVersion)
+		fmt.Println("Licensed under the Apache License, Version 2.0")
+	},
 }

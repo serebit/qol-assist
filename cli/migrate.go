@@ -16,13 +16,11 @@ package cli
 
 import "github.com/DataDrake/cli-ng/cmd"
 
-var migrateCMD = &cmd.CMD{
+var migrate = &cmd.CMD{
 	Name:  "migrate",
 	Short: "Applies migrations that are available on the system",
 	Alias: "m",
-	Run:   migrate,
-}
+	Run: func(_ *cmd.RootCMD, _ *cmd.CMD) {
 
-func migrate(_ *cmd.RootCMD, _ *cmd.CMD) {
-
+	},
 }

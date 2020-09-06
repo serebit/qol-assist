@@ -16,15 +16,15 @@ package cli
 
 import "github.com/DataDrake/cli-ng/cmd"
 
-var RootCMD = &cmd.RootCMD{
+var Root = &cmd.RootCMD{
 	Name:  "qol-assist",
 	Short: "QoL assistance to help Solus roll!",
 }
 
 func init() {
-	RootCMD.RegisterCMD(&cmd.Help)
-	RootCMD.RegisterCMD(triggerCMD)
-	RootCMD.RegisterCMD(versionCMD)
-	RootCMD.RegisterCMD(migrateCMD)
-	RootCMD.RegisterCMD(listUsersCMD)
+	Root.RegisterCMD(&cmd.Help)
+	Root.RegisterCMD(trigger)
+	Root.RegisterCMD(version)
+	Root.RegisterCMD(migrate)
+	Root.RegisterCMD(listUsers)
 }

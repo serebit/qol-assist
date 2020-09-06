@@ -16,12 +16,11 @@ package cli
 
 import "github.com/DataDrake/cli-ng/cmd"
 
-var listUsersCMD = &cmd.CMD{
+var listUsers = &cmd.CMD{
 	Name:  "list-users",
 	Short: "List users on the system and their associated groups",
-	Run:   listUsers,
-}
+	Alias: "lu",
+	Run:   func(_ *cmd.RootCMD, _ *cmd.CMD) {
 
-func listUsers(_ *cmd.RootCMD, _ *cmd.CMD) {
-
+	},
 }
