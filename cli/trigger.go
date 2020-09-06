@@ -20,6 +20,9 @@ import (
 	"os"
 )
 
+const trackDir = "/var/lib/qol-assist"
+const triggerFile = trackDir + "/trigger"
+
 var trigger = &cmd.CMD{
 	Name:  "trigger",
 	Short: "Schedule migration on next boot",
@@ -28,6 +31,23 @@ var trigger = &cmd.CMD{
 	Run: func(_ *cmd.RootCMD, _ *cmd.CMD) {
 		if os.Geteuid() != 0 || os.Getegid() != 0 {
 			fmt.Println("This command must be run with root privileges.")
+			return
 		}
+
+		if _, err := os.Stat(trackDir); os.IsNotExist(err) {
+			if err := os.Mkdir(trackDir, 0o755); err != nil {
+				fmt.Printf("Failed to construct directory %s: %s\n", trackDir, err)
+				return
+			}
+		}
+
+		if _, err := os.Stat(triggerFile); os.IsNotExist(err) {
+			if _, err := os.Create(triggerFile); err != nil {
+				fmt.Printf("Failed to create trigger file %s: %s\n", triggerFile, err)
+				return
+			}
+		}
+
+		fmt.Println("Migration will run on next boot.")
 	},
 }
