@@ -14,13 +14,20 @@
 
 package cli
 
-import "github.com/DataDrake/cli-ng/cmd"
+import (
+	"fmt"
+	"github.com/DataDrake/cli-ng/cmd"
+	"os"
+)
 
 var migrate = &cmd.CMD{
 	Name:  "migrate",
 	Short: "Applies migrations that are available on the system",
 	Alias: "m",
+	Args:  &struct{}{},
 	Run: func(_ *cmd.RootCMD, _ *cmd.CMD) {
-
+		if os.Geteuid() != 0 || os.Getegid() != 0 {
+			fmt.Println("This command must be run with root privileges.")
+		}
 	},
 }

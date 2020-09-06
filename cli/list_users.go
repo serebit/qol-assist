@@ -14,13 +14,20 @@
 
 package cli
 
-import "github.com/DataDrake/cli-ng/cmd"
+import (
+	"fmt"
+	"github.com/DataDrake/cli-ng/cmd"
+	"os"
+)
 
 var listUsers = &cmd.CMD{
 	Name:  "list-users",
 	Short: "List users on the system and their associated groups",
 	Alias: "l",
-	Run:   func(_ *cmd.RootCMD, _ *cmd.CMD) {
-
+	Args:  &struct{}{},
+	Run: func(_ *cmd.RootCMD, _ *cmd.CMD) {
+		if os.Geteuid() != 0 || os.Getegid() != 0 {
+			fmt.Println("This command must be run with root privileges.")
+		}
 	},
 }

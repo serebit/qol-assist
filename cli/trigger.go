@@ -15,14 +15,19 @@
 package cli
 
 import (
+	"fmt"
 	"github.com/DataDrake/cli-ng/cmd"
+	"os"
 )
 
 var trigger = &cmd.CMD{
 	Name:  "trigger",
 	Short: "Schedule migration on next boot",
 	Alias: "t",
+	Args:  &struct{}{},
 	Run: func(_ *cmd.RootCMD, _ *cmd.CMD) {
-
+		if os.Geteuid() != 0 || os.Getegid() != 0 {
+			fmt.Println("This command must be run with root privileges.")
+		}
 	},
 }

@@ -25,6 +25,7 @@ var version = &cmd.CMD{
 	Name:  "version",
 	Short: "Print the qol-assist version and exit",
 	Alias: "v",
+	Args:  &struct{}{},
 	Run: func(_ *cmd.RootCMD, _ *cmd.CMD) {
 		fmt.Printf("qol-assist version %v\n\nCopyright © 2017-2020 Solus Project\n", QolAssistVersion)
 		fmt.Println("Licensed under the Apache License, Version 2.0")
