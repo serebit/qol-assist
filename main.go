@@ -12,15 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package cmd
+package main
 
-import (
-	"github.com/spf13/cobra"
-)
+import "github.com/getsolus/qol-assist/cli"
 
-var CLIDebug bool
-
-var RootCmd = &cobra.Command{
-	Use:   "qol-assist",
-	Short: "qol-assist is QoL assistance to help Solus roll!",
+func main() {
+	cli.RootCMD.Run()
 }

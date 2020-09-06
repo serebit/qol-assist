@@ -1,8 +1,18 @@
-/build/
+qol-assist
 
-/bin/
-/pkg/
+.idea/*
+.vscode/*
 
-# GoLand files
-/.idea/
-/*.iml
+_build/*
+build/*
+vendor/*
+
+*.exe
+*.test
+*.prof
+*.log
+
+*.1
+
+*~
+tags

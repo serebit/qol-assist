@@ -12,22 +12,22 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package cmd
+package cli
 
-import "github.com/spf13/cobra"
+import (
+	"fmt"
+	"github.com/DataDrake/cli-ng/cmd"
+)
 
-var migrateCmd = &cobra.Command{
-	Use: "migrate",
-	Short: "Perform migration functions",
-	Long: "Applies migrations that are available on the system",
-	Aliases: []string{"m"},
-	Run: migrate,
+const QolAssistVersion = "0.5.0"
+
+var versionCMD = &cmd.CMD{
+	Name:  "version",
+	Short: "Print the qol-assist version and exit",
+	Run:   printVersion,
 }
 
-func init() {
-	RootCmd.AddCommand(listUsersCmd)
-}
-
-func migrate(_ *cobra.Command, _ []string) {
-
+func printVersion(_ *cmd.RootCMD, _ *cmd.CMD) {
+	fmt.Printf("qol-assist version %v\n\nCopyright © 2017-2020 Solus Project\n", QolAssistVersion)
+	fmt.Println("Licensed under the Apache License, Version 2.0")
 }

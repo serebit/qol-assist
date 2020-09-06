@@ -1,59 +1,83 @@
-PROJECT_ROOT := src/
-VERSION = 0.5.0
+.POSIX:
+.SUFFIXES:
+
+PKGNAME=qol-assist
+MODULE=github.com/getsolus/qol-assist
+
+VERSION="0.5.0"
+
+PREFIX?=/usr/local
+BINDIR?=$(DESTDIR)$(PREFIX)/bin
+SYSDIR?=$(DESTDIR)/etc/$(PKGNAME).d
+USRDIR?=$(DESTDIR)$(PREFIX)/share/default/$(PKGNAME).d
+STATEPATH?=$(DESTDIR)/var/cache/$(PKGNAME)/state
+GO?=go
+GOFLAGS?=
+
+GOSRC!=find . -name '*.go'
+GOSRC+=go.mod go.sum
+
+qol-assist: $(GOSRC)
+	$(GO) build $(GOFLAGS) \
+		-ldflags " \
+		-X $(MODULE)/cli.VersionNumber=$(VERSION) \
+		-X $(MODULE)/config.SysDir=$(SYSDIR) \
+		-X $(MODULE)/config.UsrDir=$(USRDIR) \
+		-X $(MODULE)/state.Path=$(STATEPATH)" \
+		-o $@
+
+all: qol-assist
+
+# Exists in GNUMake but not in NetBSD make and others.
+RM?=rm -f
+
+clean:
+	$(GO) mod tidy
+	$(RM) $(DOCS) $(PKGNAME) *.tar.gz
+	$(RM) -r vendor
+
+install: all
+	mkdir -m755 -p $(BINDIR) $(USRDIR) $(SYSDIR) $(LOGDIR)
+	install -m755 $(PKGNAME) $(BINDIR)/$(PKGNAME)
+
+RMDIR_IF_EMPTY:=sh -c '\
+if test -d $$0 && ! ls -1qA $$0 | grep -q . ; then \
+	rmdir $$0; \
+fi'
+
+uninstall:
+	$(RM) $(BINDIR)/$(PKGNAME)
+	$(RM) -r $(LOGDIR)
+	$(RM) -r $(SYSDIR)
+	$(RM) -r $(USRDIR)
+	$(RMDIR_IF_EMPTY) $(BINDIR)
+
+check:
+	$(GO) get -u golang.org/x/lint/golint
+	$(GO) get -u github.com/securego/gosec/cmd/gosec
+	$(GO) get -u honnef.co/go/tools/cmd/staticcheck
+	$(GO) get -u gitlab.com/opennota/check/cmd/aligncheck
+	$(GO) fmt -x ./...
+	$(GO) vet ./...
+	golint -set_exit_status `go list ./... | grep -v vendor`
+	gosec -exclude=G204 ./...
+	staticcheck ./...
+	aligncheck ./...
+	$(GO) test -cover ./...
+
+vendor: check clean
+	$(GO) mod vendor
+
+package: vendor
+	tar --exclude='.git' \
+		--exclude='*.tar.gz' \
+	       	--exclude='examples' \
+	       	--exclude="tags" \
+	       	--exclude=".vscode" \
+	       	--exclude=".idea"
+		--exclude="*~" \
+		-zcvf $(PKGNAME)-v$(VERSION).tar.gz ../$(PKGNAME)
 
 .DEFAULT_GOAL := all
 
-# The resulting binaries map to the subproject names
-BINARIES = \
-	qol-assist
-
-GO_TESTS = \
-	builder.test
-
-include Makefile.gobuild
-
-_PKGS = \
-	builder \
-	builder/source \
-	qol-assist \
-	qol-assist/cmd
-
-# We want to add compliance for all built binaries
-_CHECK_COMPLIANCE = $(addsuffix .compliant,$(_PKGS))
-
-# Build all binaries as static binary
-BINS = $(addsuffix .statbin,$(BINARIES))
-
-# Ensure our own code is compliant..
-compliant: $(_CHECK_COMPLIANCE)
-install: $(BINS)
-	test -d $(DESTDIR)/usr/bin || install -D -d -m 00755 $(DESTDIR)/usr/bin; \
-	install -m 00755 bin/* $(DESTDIR)/usr/bin/.; \
-	test -d $(DESTDIR)/usr/lib/systemd/system || install -D -d -m 00755 $(DESTDIR)/usr/lib/systemd/system; \
-	install -m 00644 data/*.service $(DESTDIR)/usr/lib/systemd/system/.;
-	test -d $(DESTDIR)/usr/share/man/man1 || install -D -d -m 00755 $(DESTDIR)/usr/share/man/man1; \
-	install -m 00644 man/*.1 $(DESTDIR)/usr/share/man/man1/.;
-
-
-ensure_modules:
-	@ ( \
-		git submodule init; \
-		git submodule update; \
-	);
-
-# Credit to swupd developers: https://github.com/clearlinux/swupd-client
-MANPAGES = \
-	man/qol-assist.1
-
-gen_docs:
-	for MANPAGE in $(MANPAGES); do \
-		ronn --roff < $${MANPAGE}.md > $${MANPAGE}; \
-		ronn --html < $${MANPAGE}.md > $${MANPAGE}.html; \
-	done
-
-# See: https://github.com/meitar/git-archive-all.sh/blob/master/git-archive-all.sh
-release: ensure_modules
-	git-archive-all --format tar --prefix qol-assist-$(VERSION)/ --verbose -t HEAD qol-assist-$(VERSION).tar
-	xz -9 "qol-assist-${VERSION}.tar"
-
-all: $(BINS)
+.PHONY: all clean install uninstall check vendor package

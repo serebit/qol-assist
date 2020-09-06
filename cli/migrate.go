@@ -12,15 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package main
+package cli
 
-import (
-	"os"
-	"qol-assist/cmd"
-)
+import "github.com/DataDrake/cli-ng/cmd"
 
-func main() {
-	if err := cmd.RootCmd.Execute(); err != nil {
-		os.Exit(1)
-	}
+var migrateCMD = &cmd.CMD{
+	Name:  "migrate",
+	Short: "Applies migrations that are available on the system",
+	Alias: "m",
+	Run:   migrate,
+}
+
+func migrate(_ *cmd.RootCMD, _ *cmd.CMD) {
+
 }

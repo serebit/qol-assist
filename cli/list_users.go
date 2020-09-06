@@ -12,22 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package cmd
+package cli
 
-import "github.com/spf13/cobra"
+import "github.com/DataDrake/cli-ng/cmd"
 
-var triggerCmd = &cobra.Command{
-	Use: "trigger",
-	Short: "Schedule migration on next boot",
-	Long: "Schedules available migrations to be run after the system is rebooted",
-	Aliases: []string{"t"},
-	Run: trigger,
+var listUsersCMD = &cmd.CMD{
+	Name:  "list-users",
+	Short: "List users on the system and their associated groups",
+	Args:  &struct{}{},
+	Run:   listUsers,
 }
 
-func init() {
-	RootCmd.AddCommand(listUsersCmd)
-}
-
-func trigger(_ *cobra.Command, _ []string) {
+func listUsers(_ *cmd.RootCMD, _ *cmd.CMD) {
 
 }
