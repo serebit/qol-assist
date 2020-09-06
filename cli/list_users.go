@@ -44,7 +44,7 @@ var listUsers = &cmd.CMD{
 				fallthrough
 			case filter == "system" && !it.isActive:
 				fallthrough
-			case filter == "admin" && it.isAdmin:
+			case filter == "admin" && (it.isRoot || it.isAdmin):
 				fmt.Printf("User: %s (%s)\n", it.name, strings.Join(it.groups, ":"))
 			}
 		}
@@ -59,6 +59,7 @@ type user struct {
 	name     string
 	groups   []string
 	isActive bool
+	isRoot   bool
 	isAdmin  bool
 }
 
@@ -89,7 +90,8 @@ func obtainAllUsers() []user {
 			name:     C.GoString(pwd.pw_name),
 			groups:   groupNames,
 			isActive: uid >= minimumUID && contains(shells, C.GoString(pwd.pw_shell)),
-			isAdmin:  (uid == 0 && int(pwd.pw_gid) == 0) || contains(groupNames, wheelGroup),
+			isRoot:   uid == 0 && int(pwd.pw_gid) == 0,
+			isAdmin:  contains(groupNames, wheelGroup),
 		})
 	}
 	C.endpwent()
