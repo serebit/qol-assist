@@ -20,7 +20,12 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"strconv"
 )
+
+const TrackDir = "/var/lib/qol-assist"
+const TriggerFile = TrackDir + "/trigger"
+const StatusFile = TrackDir + "/status"
 
 type Migration struct {
 	Name string
@@ -66,6 +71,50 @@ func (m *Migration) Validate() error {
 	// is no need to continue
 	if len(m.AddUsersToGroup) == 0 && len(m.UpdateGroupID) == 0 {
 		return fmt.Errorf("migrations must contain at least one modification")
+	}
+	return nil
+}
+
+// Grab the current migration level from the status file.
+// If the file doesn't exist, or we have parse issues, we default to 0.
+func GetMigrationLevel() int {
+	var bytes []byte
+	var err error
+	if bytes, err = ioutil.ReadFile(StatusFile); err != nil {
+		// file doesn't exist, default
+		return 0
+	}
+
+	if level, err := strconv.Atoi(string(bytes)); err != nil || level < 0 {
+		// parse error, default
+		return 0
+	} else {
+		return level
+	}
+}
+
+func ConstructTrackDir() error {
+	if _, err := os.Stat(TrackDir); os.IsNotExist(err) {
+		if err := os.Mkdir(TrackDir, 0o755); err != nil {
+			return err
+		}
+	} else if err != nil {
+		return err
+	}
+	return nil
+}
+
+func CreateTriggerFile() error {
+	if err := ConstructTrackDir(); err != nil {
+		return err
+	}
+
+	if _, err := os.Stat(TriggerFile); os.IsNotExist(err) {
+		if _, err := os.Create(TriggerFile); err != nil {
+			return err
+		}
+	} else if err != nil {
+		return err
 	}
 	return nil
 }

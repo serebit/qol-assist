@@ -17,11 +17,9 @@ package cli
 import (
 	"fmt"
 	"github.com/DataDrake/cli-ng/cmd"
+	"github.com/getsolus/qol-assist/config"
 	"os"
 )
-
-const trackDir = "/var/lib/qol-assist"
-const triggerFile = trackDir + "/trigger"
 
 var trigger = &cmd.CMD{
 	Name:  "trigger",
@@ -34,18 +32,9 @@ var trigger = &cmd.CMD{
 			return
 		}
 
-		if _, err := os.Stat(trackDir); os.IsNotExist(err) {
-			if err := os.Mkdir(trackDir, 0o755); err != nil {
-				fmt.Printf("Failed to construct directory %s: %s\n", trackDir, err)
-				return
-			}
-		}
-
-		if _, err := os.Stat(triggerFile); os.IsNotExist(err) {
-			if _, err := os.Create(triggerFile); err != nil {
-				fmt.Printf("Failed to create trigger file %s: %s\n", triggerFile, err)
-				return
-			}
+		if err := config.CreateTriggerFile(); err != nil {
+			fmt.Printf("Failed to create trigger file %s: %s\n", config.TriggerFile, err)
+			return
 		}
 
 		fmt.Println("Migration will run on next boot.")
