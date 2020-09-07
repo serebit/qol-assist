@@ -1,0 +1,5 @@
+description = "Add all active/admin users into the plugdev group"
+
+[[add-users-to-group]]
+user-filters = ["active", "admin"]
+group-name = "plugdev"
