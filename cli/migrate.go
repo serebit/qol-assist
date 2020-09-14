@@ -17,6 +17,7 @@ package cli
 import (
 	"fmt"
 	"github.com/DataDrake/cli-ng/cmd"
+	"github.com/getsolus/qol-assist/migration"
 	"os"
 )
 
@@ -28,6 +29,12 @@ var migrate = &cmd.CMD{
 	Run: func(_ *cmd.RootCMD, _ *cmd.CMD) {
 		if os.Geteuid() != 0 || os.Getegid() != 0 {
 			fmt.Println("This command must be run with root privileges.")
+			return
+		}
+
+		if !migration.TriggerFileExists() {
+			fmt.Println("Refusing to run migration without trigger file.")
+			return
 		}
 	},
 }

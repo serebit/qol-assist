@@ -17,7 +17,7 @@ package cli
 import (
 	"fmt"
 	"github.com/DataDrake/cli-ng/cmd"
-	"github.com/getsolus/qol-assist/config"
+	"github.com/getsolus/qol-assist/migration"
 	"os"
 )
 
@@ -32,8 +32,8 @@ var trigger = &cmd.CMD{
 			return
 		}
 
-		if err := config.CreateTriggerFile(); err != nil {
-			fmt.Printf("Failed to create trigger file %s: %s\n", config.TriggerFile, err)
+		if err := migration.CreateTriggerFile(); err != nil {
+			fmt.Printf("Failed to create trigger file %s: %s\n", migration.TriggerFile, err)
 			return
 		}
 
