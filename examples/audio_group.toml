@@ -1,5 +1,5 @@
 description = "Add all active/admin users into the audio group"
 
-[[add-users-to-group]]
-user-filters = ["active", "admin"]
-group-name = "audio"
+[[users-update]]
+only = ["active", "admin"]
+group = "audio"

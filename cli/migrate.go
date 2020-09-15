@@ -17,7 +17,7 @@ package cli
 import (
 	"fmt"
 	"github.com/DataDrake/cli-ng/cmd"
-	"github.com/getsolus/qol-assist/migration"
+	"github.com/getsolus/qol-assist/core"
 	"os"
 )
 
@@ -32,9 +32,14 @@ var migrate = &cmd.CMD{
 			return
 		}
 
-		if !migration.TriggerFileExists() {
+		if !core.TriggerFileExists() {
 			fmt.Println("Refusing to run migration without trigger file.")
 			return
+		}
+
+		var _, err = core.NewContext()
+		if err != nil {
+			fmt.Printf("Unable to gather system info: %s\n", err)
 		}
 	},
 }

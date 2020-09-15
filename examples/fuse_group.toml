@@ -1,5 +1,5 @@
 description = "Add all active/admin users into the fuse group"
 
-[[add-users-to-group]]
-user-filters = ["active", "admin"]
-group-name = "fuse"
+[[users-update]]
+only = ["active", "admin"]
+group = "fuse"

@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package migration
+package core
 
 import (
 	"fmt"
@@ -23,19 +23,19 @@ type Migration struct {
 	Name string
 	Path string
 
-	Description     string            `toml:"description"`
-	AddUsersToGroup []AddUsersToGroup `toml:"add-users-to-group"`
-	UpdateGroupID   []UpdateGroupID   `toml:"update-group-id"`
+	Description string        `toml:"description"`
+	UpdateUsers []UpdateUsers `toml:"users-update"`
+	UpdateGroup []UpdateGroup `toml:"group-update"`
 }
 
-type AddUsersToGroup struct {
-	UserFilters []string `toml:"user-filters"`
-	GroupName   string   `toml:"group-name"`
+type UpdateUsers struct {
+	UserFilters []string `toml:"only"`
+	GroupName   string   `toml:"group"`
 }
 
-type UpdateGroupID struct {
-	GroupName  string `toml:"group-name"`
-	NewGroupID int32  `toml:"new-group-id"`
+type UpdateGroup struct {
+	GroupName  string `toml:"name"`
+	NewGroupID int32  `toml:"id"`
 }
 
 // Load reads a Migration configuration from a file and parses it
@@ -56,8 +56,21 @@ func (m *Migration) Load(path string) error {
 func (m *Migration) Validate() error {
 	// Verify that there is at least one binary to execute, otherwise there
 	// is no need to continue
-	if len(m.AddUsersToGroup) == 0 && len(m.UpdateGroupID) == 0 {
+	if len(m.UpdateUsers) == 0 && len(m.UpdateGroup) == 0 {
 		return fmt.Errorf("migrations must contain at least one modification")
 	}
 	return nil
+}
+
+func (m *Migration) Run(context *Context) {
+	for _, task := range m.UpdateUsers {
+		var filtered = context.FilterUsers(task.UserFilters...)
+
+		for _, user := range filtered {
+			var _, err = context.AddToGroup(user, task.GroupName)
+			if err != nil {
+				fmt.Printf("Failed to run migration %s due to error: %s", m.Name, err)
+			}
+		}
+	}
 }

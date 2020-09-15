@@ -1,0 +1,200 @@
+// Copyright © 2020-2020 Solus Project
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+// http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+package core
+
+// #include <pwd.h>
+// #include <grp.h>
+// #include <unistd.h>
+import "C"
+
+import (
+	"fmt"
+	"os/exec"
+	gouser "os/user"
+	"strconv"
+)
+
+const minimumUID = 1000
+const wheelGroup = "sudo"
+
+type Context struct {
+	usermod string
+	users   []User
+	groups  []gouser.Group
+	shells  []string
+}
+
+type User struct {
+	Name     string
+	Groups   []string
+	IsActive bool
+	IsRoot   bool
+	IsAdmin  bool
+}
+
+func NewContext() (*Context, error) {
+	return (&Context{}).init()
+}
+
+func (c *Context) FilterUsers(filters ...string) []User {
+	var filtered = make([]User, 0)
+
+	for _, it := range c.users {
+		switch {
+		case contains(filters, "all"):
+			fallthrough
+		case contains(filters, "active") && it.IsActive:
+			fallthrough
+		case contains(filters, "system") && !it.IsActive:
+			fallthrough
+		case contains(filters, "admin") && (it.IsRoot || it.IsAdmin):
+			filtered = append(filtered, it)
+		}
+	}
+
+	return filtered
+}
+
+func (c *Context) AddToGroup(user User, group string) (bool, error) {
+	if !contains(user.Groups, group) {
+		var cmd = &exec.Cmd{
+			Path: c.usermod,
+			Args: []string{c.usermod, "-aG", group, user.Name},
+		}
+
+		if err := cmd.Run(); err != nil {
+			return false, err
+		}
+
+		user.Groups = append(user.Groups, group)
+		return true, nil
+	} else {
+		return false, nil
+	}
+}
+
+func (c *Context) init() (*Context, error) {
+	var err error
+
+	if c.usermod, err = exec.LookPath("usermod"); err != nil {
+		return c, fmt.Errorf("usermod command could not be found in PATH")
+	}
+
+	c.shells = activeShells()
+
+	if err = c.populateGroups(); err != nil {
+		return c, fmt.Errorf("failed to obtain groups from /etc/groups: %s", err)
+	}
+
+	if err = c.populateUsers(); err != nil {
+		return c, fmt.Errorf("failed to obtain users from /etc/passwd: %s", err)
+	}
+
+	return c, nil
+}
+
+func (c *Context) populateGroups() error {
+	c.groups = make([]gouser.Group, 0)
+
+	C.setgrent()
+	for {
+		var gr = C.getgrent()
+		if gr == nil {
+			break
+		}
+
+		var group, err = gouser.LookupGroup(C.GoString(gr.gr_name))
+		if err != nil {
+			return err
+		}
+
+		c.groups = append(c.groups, *group)
+	}
+	C.endgrent()
+
+	return nil
+}
+
+func (c *Context) populateUsers() error {
+	c.users = make([]User, 0)
+	var err error
+
+	C.setpwent()
+	for {
+		var pw = C.getpwent()
+		if pw == nil {
+			break
+		}
+
+		var uid = int(pw.pw_uid)
+
+		var it, err = gouser.LookupId(strconv.Itoa(uid))
+		if err != nil {
+			break
+		}
+
+		var groupIdStrings []string
+		if groupIdStrings, err = it.GroupIds(); err != nil {
+			break
+		}
+
+		var groupNames = c.groupNamesFromGUIDs(groupIdStrings)
+		c.users = append(c.users, User{
+			Name:     C.GoString(pw.pw_name),
+			Groups:   groupNames,
+			IsActive: uid >= minimumUID && contains(c.shells, C.GoString(pw.pw_shell)),
+			IsRoot:   uid == 0 && int(pw.pw_gid) == 0,
+			IsAdmin:  contains(groupNames, wheelGroup),
+		})
+	}
+	C.endpwent()
+
+	return err
+}
+
+func (c *Context) groupNamesFromGUIDs(guidStrings []string) []string {
+	var groupNames = make([]string, 0, len(guidStrings))
+	for _, group := range c.groups {
+		if contains(guidStrings, group.Gid) {
+			groupNames = append(groupNames, group.Name)
+		}
+	}
+	return groupNames
+}
+
+func activeShells() []string {
+	var shells = make([]string, 0)
+
+	C.setusershell()
+	for {
+		var cShell = C.getusershell()
+		if cShell == nil {
+			break
+		}
+		shells = append(shells, C.GoString(cShell))
+	}
+	C.endusershell()
+
+	return shells
+}
+
+func contains(list []string, item string) bool {
+	for _, it := range list {
+		if it == item {
+			return true
+		}
+	}
+	return false
+}

@@ -7,6 +7,6 @@ description = """
     for anything.
 """
 
-[[update-group-id]]
-group-name = "users"
-new-group-id = 100
+[[group-update]]
+name = "users"
+id = 100
