@@ -19,7 +19,7 @@ import (
 	"github.com/DataDrake/cli-ng/cmd"
 )
 
-const QolAssistVersion = "0.5.0"
+var VersionNumber string
 
 var version = &cmd.CMD{
 	Name:  "version",
@@ -27,7 +27,7 @@ var version = &cmd.CMD{
 	Alias: "v",
 	Args:  &struct{}{},
 	Run: func(_ *cmd.RootCMD, _ *cmd.CMD) {
-		fmt.Printf("qol-assist version %v\n\nCopyright © 2017-2020 Solus Project\n", QolAssistVersion)
+		fmt.Printf("qol-assist version %v\n\nCopyright © 2017-2020 Solus Project\n", VersionNumber)
 		fmt.Println("Licensed under the Apache License, Version 2.0")
 	},
 }

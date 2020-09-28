@@ -17,6 +17,7 @@ package core
 import (
 	"fmt"
 	"github.com/BurntSushi/toml"
+	"io/ioutil"
 )
 
 type Migration struct {
@@ -38,31 +39,67 @@ type UpdateGroup struct {
 	NewGroupID int32  `toml:"id"`
 }
 
-// Load reads a Migration configuration from a file and parses it
-func (m *Migration) Load(path string) error {
+func LoadMigrations() []Migration {
+	var allMigrations = make([]Migration, 0)
+
+	if sysFiles, err := ioutil.ReadDir(SysDir); err != nil {
+		fmt.Printf("System directory for migrations at %s is unreadable, skipping...\n", SysDir)
+	} else {
+		for _, it := range sysFiles {
+			allMigrations = appendMigrationFrom(allMigrations, SysDir, it.Name())
+		}
+	}
+
+	if usrFiles, err := ioutil.ReadDir(UsrDir); err != nil {
+		fmt.Printf("User directory for migrations at %s is unreadable, skipping...\n", UsrDir)
+	} else {
+		for _, it := range usrFiles {
+			allMigrations = appendMigrationFrom(allMigrations, UsrDir, it.Name())
+		}
+	}
+
+	return allMigrations
+}
+
+func appendMigrationFrom(migrations []Migration, dir string, name string) []Migration {
+	if migration, err := parseMigration(dir, name); err != nil {
+		fmt.Println(err)
+	} else {
+		migrations = append(migrations, migration)
+	}
+	return migrations
+}
+
+func parseMigration(dir string, name string) (Migration, error) {
+	var migration Migration
+
 	// Read the configuration into the program
+	var path = fmt.Sprintf("%s/%s", dir, name)
 	var cfg, err = readFile(path)
 	if err != nil {
-		return fmt.Errorf("unable to read config file located at %s", path)
+		return migration, fmt.Errorf("unable to read migration file located at %s due to %s", path, err)
 	}
 
 	// Save the configuration into the content structure
-	if err := toml.Unmarshal(cfg, m); err != nil {
-		return fmt.Errorf("unable to read config file located at %s due to %s", path, err.Error())
+	if err := toml.Unmarshal(cfg, &migration); err != nil {
+		return migration, fmt.Errorf("unable to parse migration file located at %s due to %s", path, err.Error())
 	}
-	return nil
+
+	migration.Name = name
+	migration.Path = path
+
+	return migration, nil
 }
 
-func (m *Migration) Validate() error {
-	// Verify that there is at least one binary to execute, otherwise there
-	// is no need to continue
+func (m Migration) Validate() error {
 	if len(m.UpdateUsers) == 0 && len(m.UpdateGroup) == 0 {
 		return fmt.Errorf("migrations must contain at least one modification")
 	}
 	return nil
 }
 
-func (m *Migration) Run(context *Context) {
+func (m Migration) Run(context *Context) {
+	fmt.Printf("Running migration %s\n", m.Name)
 	for _, task := range m.UpdateUsers {
 		var filtered = context.FilterUsers(task.UserFilters...)
 

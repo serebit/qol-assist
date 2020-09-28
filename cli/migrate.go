@@ -37,9 +37,14 @@ var migrate = &cmd.CMD{
 			return
 		}
 
-		var _, err = core.NewContext()
+		var context, err = core.NewContext()
 		if err != nil {
 			fmt.Printf("Unable to gather system info: %s\n", err)
+		}
+
+		var migrations = core.LoadMigrations()
+		for _, it := range migrations {
+			it.Run(context)
 		}
 	},
 }

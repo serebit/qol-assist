@@ -10,7 +10,7 @@ PREFIX?=/usr/local
 BINDIR?=$(DESTDIR)$(PREFIX)/bin
 SYSDIR?=$(DESTDIR)/etc/$(PKGNAME).d
 USRDIR?=$(DESTDIR)$(PREFIX)/share/default/$(PKGNAME).d
-STATEPATH?=$(DESTDIR)/var/cache/$(PKGNAME)/state
+TRACKDIR?=$(DESTDIR)/var/lib/$(PKGNAME)
 GO?=go
 GOFLAGS?=
 
@@ -21,9 +21,9 @@ qol-assist: $(GOSRC)
 	$(GO) build $(GOFLAGS) \
 		-ldflags " \
 		-X $(MODULE)/cli.VersionNumber=$(VERSION) \
-		-X $(MODULE)/config.SysDir=$(SYSDIR) \
-		-X $(MODULE)/config.UsrDir=$(USRDIR) \
-		-X $(MODULE)/state.Path=$(STATEPATH)" \
+		-X $(MODULE)/core.TrackDir=$(TRACKDIR) \
+		-X $(MODULE)/core.SysDir=$(SYSDIR) \
+		-X $(MODULE)/core.UsrDir=$(USRDIR)" \
 		-o $@
 
 all: qol-assist

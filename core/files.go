@@ -20,8 +20,12 @@ import (
 	"path/filepath"
 )
 
-const TrackDir = "/var/lib/qol-assist"
-const TriggerFile = TrackDir + "/trigger"
+var (
+	TrackDir string
+	SysDir string
+	UsrDir string
+	TriggerFile = TrackDir + "/trigger"
+)
 
 func createDir(path string) error {
 	if _, err := os.Stat(path); os.IsNotExist(err) {
