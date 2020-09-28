@@ -101,7 +101,6 @@ func (m Migration) Validate() error {
 }
 
 func (m Migration) Run(context *Context) {
-	fmt.Printf("Running migration %s\n", m.Name)
 	for _, task := range m.UpdateUsers {
 		m.updateUsers(context, task)
 	}

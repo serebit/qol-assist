@@ -44,7 +44,14 @@ var migrate = &cmd.CMD{
 
 		var migrations = core.LoadMigrations()
 		for _, it := range migrations {
+			fmt.Printf("Performing migration %s\n", it.Name)
 			it.Run(context)
+		}
+
+		fmt.Println("Migrations complete.")
+
+		if err := core.RemoveTriggerFile(); err != nil {
+			fmt.Printf("WARNING: Failed to remove trigger file %s due to error: %s\n", core.TriggerFile, err)
 		}
 	},
 }

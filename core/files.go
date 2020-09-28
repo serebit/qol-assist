@@ -21,9 +21,9 @@ import (
 )
 
 var (
-	TrackDir string
-	SysDir string
-	UsrDir string
+	TrackDir    string
+	SysDir      string
+	UsrDir      string
 	TriggerFile = TrackDir + "/trigger"
 )
 
@@ -68,6 +68,17 @@ func CreateTriggerFile() error {
 		return err
 	}
 	return createFile(TriggerFile)
+}
+
+func RemoveTriggerFile() error {
+	if _, err := os.Stat(TriggerFile); err == nil {
+		if err := os.Remove(TriggerFile); err != nil {
+			return err
+		}
+	} else {
+		return err
+	}
+	return nil
 }
 
 func TriggerFileExists() bool {
