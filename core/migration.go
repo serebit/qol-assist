@@ -18,6 +18,8 @@ import (
 	"fmt"
 	"github.com/BurntSushi/toml"
 	"io/ioutil"
+	gouser "os/user"
+	"strconv"
 )
 
 type Migration struct {
@@ -36,7 +38,7 @@ type UpdateUsers struct {
 
 type UpdateGroup struct {
 	GroupName  string `toml:"name"`
-	NewGroupID int32  `toml:"id"`
+	NewGroupID int    `toml:"id"`
 }
 
 func LoadMigrations() []Migration {
@@ -101,13 +103,50 @@ func (m Migration) Validate() error {
 func (m Migration) Run(context *Context) {
 	fmt.Printf("Running migration %s\n", m.Name)
 	for _, task := range m.UpdateUsers {
-		var filtered = context.FilterUsers(task.UserFilters...)
+		m.updateUsers(context, task)
+	}
+	for _, task := range m.UpdateGroup {
+		m.updateGroup(context, task)
+	}
+}
 
-		for _, user := range filtered {
-			var _, err = context.AddToGroup(user, task.GroupName)
-			if err != nil {
-				fmt.Printf("Failed to run migration %s due to error: %s", m.Name, err)
-			}
+func (m Migration) updateUsers(context *Context, task UpdateUsers) {
+	var filtered = context.FilterUsers(task.UserFilters...)
+
+	for _, user := range filtered {
+		var _, err = context.AddToGroup(user, task.GroupName)
+		if err != nil {
+			fmt.Printf("Error in %s: failed to add group %s to user %s due to error: %s\n", m.Name, task.GroupName, user.Name, err)
 		}
+	}
+}
+
+func (m Migration) updateGroup(context *Context, task UpdateGroup) {
+	var byName *gouser.Group = nil
+	var byID *gouser.Group = nil
+
+	var gid = strconv.Itoa(task.NewGroupID)
+	for _, group := range context.groups {
+		switch {
+		case group.Name == task.GroupName:
+			byName = &group
+		case group.Gid == strconv.Itoa(task.NewGroupID):
+			byID = &group
+		}
+	}
+
+	if byName == nil && byID == nil {
+		// group doesn't exist, create it
+		if err := context.CreateGroup(task.GroupName, gid); err != nil {
+			fmt.Printf("Error in %s: failed to create group with name %s and GID %s due to error %s\n", m.Name, task.GroupName, gid, err)
+		}
+	} else if byName != nil && byID == nil {
+		// group has wrong ID, fix it
+		if err := context.UpdateGroupID(task.GroupName, gid); err != nil {
+			fmt.Printf("Error in %s: failed to update group with name %s to new GID %s due to error %s\n", m.Name, task.GroupName, gid, err)
+		}
+	} else if byName != byID {
+		// there's a group with our desired ID, and it isn't supposed to have it. Fail.
+		fmt.Printf("Error in %s: incorrect group already exists with desired ID %s, skipping update for group %s\n", m.Name, gid, task.GroupName)
 	}
 }

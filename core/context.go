@@ -30,10 +30,12 @@ const minimumUID = 1000
 const wheelGroup = "sudo"
 
 type Context struct {
-	usermod string
-	users   []User
-	groups  []gouser.Group
-	shells  []string
+	usermod  string
+	groupadd string
+	groupmod string
+	users    []User
+	groups   []gouser.Group
+	shells   []string
 }
 
 type User struct {
@@ -85,11 +87,57 @@ func (c *Context) AddToGroup(user User, group string) (bool, error) {
 	}
 }
 
+func (c *Context) CreateGroup(name string, id string) error {
+	var cmd = &exec.Cmd{
+		Path: c.groupadd,
+		Args: []string{c.groupadd, "-g", id, name},
+	}
+
+	if err := cmd.Run(); err != nil {
+		return err
+	}
+
+	c.groups = append(c.groups, gouser.Group{
+		Name: name,
+		Gid:  id,
+	})
+
+	return nil
+}
+
+func (c *Context) UpdateGroupID(name string, id string) error {
+	var cmd = &exec.Cmd{
+		Path: c.groupmod,
+		Args: []string{c.groupmod, "-g", id, name},
+	}
+
+	if err := cmd.Run(); err != nil {
+		return err
+	}
+
+	for _, it := range c.groups {
+		if it.Name == name {
+			it.Gid = id
+			break
+		}
+	}
+
+	return nil
+}
+
 func (c *Context) init() (*Context, error) {
 	var err error
 
 	if c.usermod, err = exec.LookPath("usermod"); err != nil {
 		return c, fmt.Errorf("usermod command could not be found in PATH")
+	}
+
+	if c.groupadd, err = exec.LookPath("groupadd"); err != nil {
+		return c, fmt.Errorf("groupadd command could not be found in PATH")
+	}
+
+	if c.groupmod, err = exec.LookPath("groupmod"); err != nil {
+		return c, fmt.Errorf("groupadd command could not be found in PATH")
 	}
 
 	c.shells = activeShells()
