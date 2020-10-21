@@ -19,6 +19,7 @@ import (
 	"github.com/DataDrake/waterlog"
 )
 
+// VersionNumber is an externally defined string that contains qol-assist's current version
 var VersionNumber string
 
 var version = &cmd.CMD{

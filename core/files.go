@@ -21,15 +21,19 @@ import (
 )
 
 var (
-	TrackDir    string
-	SysDir      string
-	UsrDir      string
+	// TrackDir is an externally defined location used to store the TriggerFile
+	TrackDir string
+	// SysDir is an externally defined location wherein system migration files are stored
+	SysDir string
+	// UsrDir is an externally defined location wherein user migration files are stored
+	UsrDir string
+	// TriggerFile is the location of the trigger file, which must be present for migration to occur
 	TriggerFile = TrackDir + "/trigger"
 )
 
 func createDir(path string) error {
 	if _, err := os.Stat(path); os.IsNotExist(err) {
-		if err := os.Mkdir(path, 0755); err != nil {
+		if err := os.Mkdir(path, 0644); err != nil {
 			return err
 		}
 	} else if err != nil {
@@ -59,17 +63,15 @@ func readFile(path string) ([]byte, error) {
 	return ioutil.ReadFile(filepath.Clean(path))
 }
 
-func ConstructTrackDir() error {
-	return createDir(TrackDir)
-}
-
+// CreateTriggerFile creates a trigger file at TriggerFile, along with its parent directories if necessary
 func CreateTriggerFile() error {
-	if err := ConstructTrackDir(); err != nil {
+	if err := createDir(TrackDir); err != nil {
 		return err
 	}
 	return createFile(TriggerFile)
 }
 
+// RemoveTriggerFile facilitates the removal of the file at TriggerFile
 func RemoveTriggerFile() error {
 	if _, err := os.Stat(TriggerFile); err == nil {
 		if err := os.Remove(TriggerFile); err != nil {
@@ -81,6 +83,7 @@ func RemoveTriggerFile() error {
 	return nil
 }
 
+// TriggerFileExists is a convenience function to determine if a file exists at TriggerFile
 func TriggerFileExists() bool {
 	var _, err = os.Stat(TriggerFile)
 	return err == nil

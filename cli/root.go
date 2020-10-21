@@ -22,10 +22,12 @@ import (
 	"log"
 )
 
+// GlobalFlags contains the flags for the Root command
 type GlobalFlags struct {
 	Debug bool `short:"d" long:"debug"  desc:"Run in debug mode"`
 }
 
+// Root is the main command for this application
 var Root = &cmd.RootCMD{
 	Name:  "qol-assist",
 	Short: "QoL assistance to help Solus roll!",

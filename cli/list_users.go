@@ -43,6 +43,7 @@ var listUsers = &cmd.CMD{
 	},
 }
 
+// ListArgs contains the arguments for the "list-users" subcommand
 type ListArgs struct {
 	Filter string `desc:"[system|all|admin|active]"`
 }

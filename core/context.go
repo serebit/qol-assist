@@ -30,6 +30,7 @@ import (
 const minimumUID = 1000
 const wheelGroup = "sudo"
 
+// Context contains contextual system data, such as groups, users, and active shells, along with paths to certain binaries
 type Context struct {
 	usermod  string
 	groupadd string
@@ -39,6 +40,7 @@ type Context struct {
 	shells   []string
 }
 
+// User is a convenience struct with information on a user entry in /etc/passwd
 type User struct {
 	Name     string
 	Groups   []string
@@ -47,10 +49,12 @@ type User struct {
 	IsAdmin  bool
 }
 
+// NewContext creates an initialized instance of a Context object
 func NewContext() (*Context, error) {
 	return (&Context{}).init()
 }
 
+// FilterUsers returns users that fit into one or more of the given filters
 func (c *Context) FilterUsers(filters ...string) []User {
 	var filtered = make([]User, 0)
 
@@ -70,6 +74,7 @@ func (c *Context) FilterUsers(filters ...string) []User {
 	return filtered
 }
 
+// AddToGroup adds a User to a preexisting group
 func (c *Context) AddToGroup(user User, group string) (bool, error) {
 	if !contains(user.Groups, group) {
 		var cmd = &exec.Cmd{
@@ -83,11 +88,11 @@ func (c *Context) AddToGroup(user User, group string) (bool, error) {
 
 		user.Groups = append(user.Groups, group)
 		return true, nil
-	} else {
-		return false, nil
 	}
+	return false, nil
 }
 
+// CreateGroup creates a new group with the given name and ID
 func (c *Context) CreateGroup(name string, id string) error {
 	var cmd = &exec.Cmd{
 		Path: c.groupadd,
@@ -106,6 +111,7 @@ func (c *Context) CreateGroup(name string, id string) error {
 	return nil
 }
 
+// UpdateGroupID finds a group with the given name and changes its ID to the given ID
 func (c *Context) UpdateGroupID(name string, id string) error {
 	var cmd = &exec.Cmd{
 		Path: c.groupmod,
@@ -144,21 +150,17 @@ func (c *Context) init() (*Context, error) {
 	}
 
 	c.shells = activeShells()
-	waterlog.Debugln("    Gathered active shells")
+	waterlog.Debugln("    Gathered active shells from /etc/shells")
 
 	if err = c.populateGroups(); err != nil {
 		return c, fmt.Errorf("failed to obtain groups from /etc/groups: %s", err)
-	} else {
-		waterlog.Debugln("    Gathered groups from /etc/groups")
 	}
+	waterlog.Debugln("    Gathered groups from /etc/groups")
 
 	if err = c.populateUsers(); err != nil {
 		return c, fmt.Errorf("failed to obtain users from /etc/passwd: %s", err)
-	} else {
-		waterlog.Debugln("    Gathered users from /etc/passwd")
 	}
-
-	waterlog.Debugln("Finished gathering system info.")
+	waterlog.Debugln("    Gathered users from /etc/passwd")
 
 	return c, nil
 }
@@ -203,12 +205,12 @@ func (c *Context) populateUsers() error {
 			break
 		}
 
-		var groupIdStrings []string
-		if groupIdStrings, err = it.GroupIds(); err != nil {
+		var groupIDStrings []string
+		if groupIDStrings, err = it.GroupIds(); err != nil {
 			break
 		}
 
-		var groupNames = c.groupNamesFromGUIDs(groupIdStrings)
+		var groupNames = c.groupNamesFromGUIDs(groupIDStrings)
 		c.users = append(c.users, User{
 			Name:     C.GoString(pw.pw_name),
 			Groups:   groupNames,
