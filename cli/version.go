@@ -15,8 +15,8 @@
 package cli
 
 import (
-	"fmt"
 	"github.com/DataDrake/cli-ng/cmd"
+	"github.com/DataDrake/waterlog"
 )
 
 var VersionNumber string
@@ -27,7 +27,7 @@ var version = &cmd.CMD{
 	Alias: "v",
 	Args:  &struct{}{},
 	Run: func(_ *cmd.RootCMD, _ *cmd.CMD) {
-		fmt.Printf("qol-assist version %v\n\nCopyright © 2017-2020 Solus Project\n", VersionNumber)
-		fmt.Println("Licensed under the Apache License, Version 2.0")
+		waterlog.Printf("qol-assist version %v\n\nCopyright © 2017-2020 Solus Project\n", VersionNumber)
+		waterlog.Println("Licensed under the Apache License, Version 2.0")
 	},
 }

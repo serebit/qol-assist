@@ -14,11 +14,22 @@
 
 package cli
 
-import "github.com/DataDrake/cli-ng/cmd"
+import (
+	"github.com/DataDrake/cli-ng/cmd"
+	"github.com/DataDrake/waterlog"
+	"github.com/DataDrake/waterlog/format"
+	"github.com/DataDrake/waterlog/level"
+	"log"
+)
+
+type GlobalFlags struct {
+	Debug  bool `short:"d" long:"debug"  desc:"Run in debug mode"`
+}
 
 var Root = &cmd.RootCMD{
 	Name:  "qol-assist",
 	Short: "QoL assistance to help Solus roll!",
+	Flags: &GlobalFlags{},
 }
 
 func init() {
@@ -27,4 +38,8 @@ func init() {
 	Root.RegisterCMD(version)
 	Root.RegisterCMD(migrate)
 	Root.RegisterCMD(listUsers)
+
+	waterlog.SetLevel(level.Info)
+	waterlog.SetFormat(format.Min)
+	waterlog.SetFlags(log.Ltime | log.Ldate | log.LUTC)
 }

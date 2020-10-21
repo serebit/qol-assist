@@ -21,6 +21,7 @@ import "C"
 
 import (
 	"fmt"
+	"github.com/DataDrake/waterlog"
 	"os/exec"
 	gouser "os/user"
 	"strconv"
@@ -128,6 +129,8 @@ func (c *Context) UpdateGroupID(name string, id string) error {
 func (c *Context) init() (*Context, error) {
 	var err error
 
+	waterlog.Debugln("Gathering system info...")
+
 	if c.usermod, err = exec.LookPath("usermod"); err != nil {
 		return c, fmt.Errorf("usermod command could not be found in PATH")
 	}
@@ -141,14 +144,21 @@ func (c *Context) init() (*Context, error) {
 	}
 
 	c.shells = activeShells()
+	waterlog.Debugln("    Gathered active shells")
 
 	if err = c.populateGroups(); err != nil {
 		return c, fmt.Errorf("failed to obtain groups from /etc/groups: %s", err)
+	} else {
+		waterlog.Debugln("    Gathered groups from /etc/groups")
 	}
 
 	if err = c.populateUsers(); err != nil {
 		return c, fmt.Errorf("failed to obtain users from /etc/passwd: %s", err)
+	} else {
+		waterlog.Debugln("    Gathered users from /etc/passwd")
 	}
+
+	waterlog.Debugln("Finished gathering system info.")
 
 	return c, nil
 }
